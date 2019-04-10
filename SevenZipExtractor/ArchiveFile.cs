@@ -95,6 +95,45 @@ namespace SevenZipExtractor
             });
         }
 
+        public void Extract(Func<Entry, Stream> getOutputStream)
+        {
+            IList<Stream> fileStreams = new List<Stream>();
+
+            try
+            {
+                foreach (Entry entry in Entries)
+                {
+                    Stream outputStream = getOutputStream(entry);
+
+                    if (outputStream == null) // outputStream = null means SKIP
+                    {
+                        fileStreams.Add(null);
+                        continue;
+                    }
+
+                    if (entry.IsFolder)
+                    {
+                        fileStreams.Add(null);
+                        continue;
+                    }
+
+                    fileStreams.Add(outputStream);
+                }
+
+                this.archive.Extract(null, 0xFFFFFFFF, 0, new ArchiveStreamsCallback(fileStreams));
+            }
+            finally
+            {
+                foreach (Stream stream in fileStreams)
+                {
+                    if (stream != null)
+                    {
+                        stream.Dispose();
+                    }
+                }
+            }
+        }
+
         public void Extract(Func<Entry, string> getOutputPath) 
         {
             IList<Stream> fileStreams = new List<Stream>();
