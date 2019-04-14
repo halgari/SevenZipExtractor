@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
+using Alphaleonis.Win32.Filesystem;
 using System.Linq;
 using System.Runtime.InteropServices;
 
@@ -46,7 +46,7 @@ namespace SevenZipExtractor
             this.archiveStream = new InStreamWrapper(File.OpenRead(archiveFilePath));
         }
         
-        public ArchiveFile(Stream archiveStream, SevenZipFormat? format = null, string libraryFilePath = null)
+        public ArchiveFile(System.IO.Stream archiveStream, SevenZipFormat? format = null, string libraryFilePath = null)
         {
             this.libraryFilePath = libraryFilePath;
 
@@ -95,15 +95,15 @@ namespace SevenZipExtractor
             });
         }
 
-        public void Extract(Func<Entry, Stream> getOutputStream)
+        public void Extract(Func<Entry, System.IO.Stream> getOutputStream)
         {
-            IList<Stream> fileStreams = new List<Stream>();
+            IList<System.IO.Stream> fileStreams = new List<System.IO.Stream>();
 
             try
             {
                 foreach (Entry entry in Entries)
                 {
-                    Stream outputStream = getOutputStream(entry);
+                    System.IO.Stream outputStream = getOutputStream(entry);
 
                     if (outputStream == null) // outputStream = null means SKIP
                     {
@@ -124,7 +124,7 @@ namespace SevenZipExtractor
             }
             finally
             {
-                foreach (Stream stream in fileStreams)
+                foreach (System.IO.Stream stream in fileStreams)
                 {
                     if (stream != null)
                     {
@@ -136,7 +136,7 @@ namespace SevenZipExtractor
 
         public void Extract(Func<Entry, string> getOutputPath) 
         {
-            IList<Stream> fileStreams = new List<Stream>();
+            IList<System.IO.Stream> fileStreams = new List<System.IO.Stream>();
 
             try 
             {
@@ -171,7 +171,7 @@ namespace SevenZipExtractor
             }
             finally
             {
-                foreach (Stream stream in fileStreams) 
+                foreach (System.IO.Stream stream in fileStreams) 
                 {
                     if (stream != null)
                     {
@@ -338,13 +338,13 @@ namespace SevenZipExtractor
 
         private bool GuessFormatFromSignature(string filePath, out SevenZipFormat format)
         {
-            using (FileStream fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            using (System.IO.FileStream fileStream = new System.IO.FileStream(filePath, System.IO.FileMode.Open, System.IO.FileAccess.Read, System.IO.FileShare.ReadWrite))
             {
                 return GuessFormatFromSignature(fileStream, out format);
             }
         }
 
-        private bool GuessFormatFromSignature(Stream stream, out SevenZipFormat format)
+        private bool GuessFormatFromSignature(System.IO.Stream stream, out SevenZipFormat format)
         {
             int longestSignature = Formats.FileSignatures.Values.OrderByDescending(v => v.Length).First().Length;
 
