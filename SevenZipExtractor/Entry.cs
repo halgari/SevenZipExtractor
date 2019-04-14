@@ -1,5 +1,5 @@
 ﻿using System;
-using System.IO;
+using Alphaleonis.Win32.Filesystem;
 
 namespace SevenZipExtractor
 {
@@ -101,12 +101,12 @@ namespace SevenZipExtractor
                 Directory.CreateDirectory(directoryName);
             }
 
-            using (FileStream fileStream = File.Create(fileName))
+            using (System.IO.FileStream fileStream = File.Create(fileName))
             {
                 this.Extract(fileStream);
             }
         }
-        public void Extract(Stream stream)
+        public void Extract(System.IO.Stream stream)
         {
             this.archive.Extract(new[] { this.index }, 1, 0, new ArchiveStreamCallback(this.index, stream));
         }
